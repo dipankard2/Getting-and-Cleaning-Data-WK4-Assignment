@@ -12,10 +12,7 @@
 
 library(dplyr)
 
-
-##############################################################################
-# STEP 0A - Get data
-##############################################################################
+# STEP 1 - Get data
 
 # download zip file containing data if it hasn't already been downloaded
 zipUrl <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
@@ -32,9 +29,7 @@ if (!file.exists(dataPath)) {
 }
 
 
-##############################################################################
-# STEP 0B - Read data
-##############################################################################
+# STEP 2 - Read data
 
 # read training data
 trainingSubjects <- read.table(file.path(dataPath, "train", "subject_train.txt"))
@@ -56,9 +51,7 @@ activities <- read.table(file.path(dataPath, "activity_labels.txt"))
 colnames(activities) <- c("activityId", "activityLabel")
 
 
-##############################################################################
-# Step 1 - Merge the training and the test sets to create one data set
-##############################################################################
+# Step 3 - Merge the training and the test sets to create one data set
 
 # concatenate individual data tables to make single data table
 humanActivity <- rbind(
@@ -74,10 +67,10 @@ rm(trainingSubjects, trainingValues, trainingActivity,
 colnames(humanActivity) <- c("subject", features[, 2], "activity")
 
 
-##############################################################################
-# Step 2 - Extract only the measurements on the mean and standard deviation
+
+# Step 4 - Extract only the measurements on the mean and standard deviation
 #          for each measurement
-##############################################################################
+
 
 # determine columns of data set to keep based on column name...
 columnsToKeep <- grepl("subject|activity|mean|std", colnames(humanActivity))
@@ -86,19 +79,19 @@ columnsToKeep <- grepl("subject|activity|mean|std", colnames(humanActivity))
 humanActivity <- humanActivity[, columnsToKeep]
 
 
-##############################################################################
-# Step 3 - Use descriptive activity names to name the activities in the data
+
+# Step 5 - Use descriptive activity names to name the activities in the data
 #          set
-##############################################################################
+
 
 # replace activity values with named factor levels
 humanActivity$activity <- factor(humanActivity$activity, 
   levels = activities[, 1], labels = activities[, 2])
 
 
-##############################################################################
-# Step 4 - Appropriately label the data set with descriptive variable names
-##############################################################################
+
+# Step 6 - Appropriately label the data set with descriptive variable names
+
 
 # get column names
 humanActivityCols <- colnames(humanActivity)
@@ -123,10 +116,10 @@ humanActivityCols <- gsub("BodyBody", "Body", humanActivityCols)
 colnames(humanActivity) <- humanActivityCols
 
 
-##############################################################################
-# Step 5 - Create a second, independent tidy set with the average of each
+
+# Step 7 - Create a second, independent tidy set with the average of each
 #          variable for each activity and each subject
-##############################################################################
+
 
 # group by subject and activity and summarise using mean
 humanActivityMeans <- humanActivity %>% 
